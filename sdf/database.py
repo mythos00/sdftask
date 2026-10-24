@@ -31,10 +31,9 @@ class Database:
             ) from exc
 
         except psycopg.Error as exc:
-            raise RuntimeError(
-                f"PostgreSQL xətası: {type(exc).__name__}: {exc}"
-            ) from exc
-
+            st.error(f"Xəta növü: {type(exc).__name__}")
+            st.error(f"Xəta detalları: {exc}")
+            raise
     @staticmethod
     @contextmanager
     def connection():
