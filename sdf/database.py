@@ -1,3 +1,4 @@
+```python
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -21,14 +22,17 @@ class Database:
                 connect_timeout=10,
                 sslmode="require",
             )
+
         except KeyError as exc:
             raise RuntimeError(
-                "Database bağlantısı konfiqurasiya edilməyib. "
-                ".streamlit/secrets.toml faylını yoxlayın."
+                "Database konfiqurasiyası tapılmadı. "
+                "Streamlit Secrets bölməsində "
+                "[database] və url sahələrini yoxlayın."
             ) from exc
+
         except psycopg.Error as exc:
             raise RuntimeError(
-                "Verilənlər bazasına qoşulmaq mümkün olmadı."
+                f"PostgreSQL xətası: {type(exc).__name__}: {exc}"
             ) from exc
 
     @staticmethod
@@ -42,7 +46,14 @@ class Database:
     def initialize():
         """SQL sxemini verilənlər bazasına tətbiq edir."""
         schema_path = Path(__file__).with_name("schema.sql")
+
+        if not schema_path.exists():
+            raise FileNotFoundError(
+                f"schema.sql faylı tapılmadı: {schema_path}"
+            )
+
         schema_sql = schema_path.read_text(encoding="utf-8")
 
         with Database.connection() as conn:
             conn.execute(schema_sql, prepare=False)
+```
