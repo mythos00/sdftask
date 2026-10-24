@@ -1,4 +1,4 @@
-```python
+
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -56,4 +56,4 @@ class Database:
 
         with Database.connection() as conn:
             conn.execute(schema_sql, prepare=False)
-```
+
