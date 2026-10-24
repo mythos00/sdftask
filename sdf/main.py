@@ -25,17 +25,18 @@ st.set_page_config(
 def show_error(error):
     st.error(str(error))
 
-
 def initialize_app():
     try:
         Database.initialize()
+        st.success("Neon verilənlər bazasına bağlantı uğurludur!")
         return True
-    except Exception:
-        st.error(
-            "Verilənlər bazasına qoşulmaq mümkün olmadı. "
-            "Neon bağlantısını və schema.sql faylını yoxlayın."
-        )
+
+    except Exception as exc:
+        st.error(f"Xəta növü: {type(exc).__name__}")
+        st.error(f"Xəta detalları: {exc}")
         return False
+
+
 
 
 def login_page():
