@@ -1,13 +1,17 @@
-
 import re
 from datetime import date
 
 
 class ValidationError(ValueError):
-    """İstifadəçi məlumatlarının yoxlanılması xətası."""
+    """Məlumatların yoxlanılması zamanı yaranan xəta."""
 
 
 def validate_required(value: str, field_name: str) -> str:
+    if not isinstance(value, str):
+        raise ValidationError(
+            f"{field_name} mətn formatında olmalıdır."
+        )
+
     value = value.strip()
 
     if not value:
@@ -21,14 +25,21 @@ def validate_required(value: str, field_name: str) -> str:
 def validate_email(email: str) -> str:
     email = validate_required(email, "E-poçt").lower()
 
+    if len(email) > 255:
+        raise ValidationError(
+            "E-poçt ünvanı çox uzundur."
+        )
+
     if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email):
-        raise ValidationError("Düzgün e-poçt ünvanı daxil edin.")
+        raise ValidationError(
+            "Düzgün e-poçt ünvanı daxil edin."
+        )
 
     return email
 
 
 def validate_password(password: str) -> str:
-    if len(password) < 8:
+    if not isinstance(password, str) or len(password) < 8:
         raise ValidationError(
             "Şifrə ən azı 8 simvoldan ibarət olmalıdır."
         )
@@ -43,9 +54,36 @@ def validate_event(
     event_date: date,
     max_participants: int,
 ) -> None:
-    validate_required(title, "Tədbirin adı")
-    validate_required(description, "Təsvir")
-    validate_required(location, "Keçirilmə yeri")
+
+    title = validate_required(
+        title,
+        "Tədbirin adı"
+    )
+
+    description = validate_required(
+        description,
+        "Təsvir"
+    )
+
+    location = validate_required(
+        location,
+        "Keçirilmə yeri"
+    )
+
+    if len(title) > 200:
+        raise ValidationError(
+            "Tədbirin adı 200 simvoldan çox ola bilməz."
+        )
+
+    if len(location) > 200:
+        raise ValidationError(
+            "Keçirilmə yeri 200 simvoldan çox ola bilməz."
+        )
+
+    if not isinstance(event_date, date):
+        raise ValidationError(
+            "Tədbirin tarixi düzgün göstərilməyib."
+        )
 
     if event_date < date.today():
         raise ValidationError(
