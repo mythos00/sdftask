@@ -14,7 +14,22 @@ class Database:
     def get_connection():
         """Neon PostgreSQL bağlantısı yaradır."""
         try:
+            if "database" not in st.secrets:
+                raise RuntimeError(
+                    "Secrets daxilində [database] bölməsi tapılmadı."
+                )
+            
+            if "url" not in st.secrets["database"]:
+                raise RuntimeError(
+                    "Secrets daxilində database bölməsində url tapılmadı."
+                )
+            
             database_url = st.secrets["database"]["url"]
+            
+            if not database_url.startswith(("postgresql://", "postgres://")):
+                raise RuntimeError(
+                    "Database URL düzgün formatda deyil."
+                )
 
             return psycopg.connect(
                 database_url,
